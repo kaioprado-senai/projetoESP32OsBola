@@ -1,14 +1,7 @@
 <?php
 
 include 'connect.php';
-
-
-$kph = isset($_POST['kph']) ? floatval($_POST['kph']) : 0;
-$rpm = isset($_POST['rpm']) ? intval($_POST['rpm']) : 0;
-
-
-$stmt = $conn->prepare("INSERT INTO monitoramento (rpm, kph) VALUES (?, ?)");
-$stmt->bind_param("id", $rpm, $kph); 
+include 'salvar_dados.php';
 
 if ($stmt->execute()) {
 

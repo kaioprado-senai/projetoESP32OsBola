@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
 $user = 'root';
-$pass = '';
-$db   = 'esp32banco';
+$pass = 'alexcom34';
+$db   = 'sesi-3ano';
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 

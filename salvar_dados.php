@@ -1,13 +1,12 @@
 <?php
-
 include 'connect.php';
 
-$kph = isset($_POST['velocidade']);
-$rpm = isset($_POST['rpm']);
-
+$kph = $_POST['velocidade'] ?? 0; // ✅ corrigido
+$rpm = $_POST['rpm'] ?? 0;        // ✅ corrigido
 
 $stmt = $conn->prepare("INSERT INTO monitoramento (rpm, kph) VALUES (?, ?)");
-$stmt->bind_param("id", $rpm, $kph); 
+$stmt->bind_param("dd", $rpm, $kph); // ✅ "dd" para dois floats
+$stmt->execute(); // ✅ faltava isso
+$stmt->close();
 $conn->close();
-
 ?>

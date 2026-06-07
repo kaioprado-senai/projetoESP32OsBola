@@ -1,27 +1,14 @@
 <?php
-
 include 'connect.php';
-include 'salvar_dados.php';
 
-if ($stmt->execute()) {
+$query = $conn->query("SELECT rpm, kph FROM monitoramento ORDER BY id DESC LIMIT 1");
 
-    $last_id = $conn->insert_id;
-    $query = $conn->query("SELECT rpm, kph FROM monitoramento WHERE id = $last_id");
-    
-    if ($query && $query->num_rows > 0) {
-        $row = $query->fetch_assoc();
-        echo json_encode([
-            'rpm' => $row['rpm'], 
-            'kph' => $row['kph']
-        ]);
-    } else {
-
-        echo json_encode(['error' => 'Record inserted but failed to fetch']);
-    }
+if ($query && $query->num_rows > 0) {
+    $row = $query->fetch_assoc();
+    echo json_encode(['rpm' => $row['rpm'], 'kph' => $row['kph']]);
 } else {
-    echo json_encode(['error' => 'Insert failed: ' . $stmt->error]);
+    echo json_encode(['rpm' => 0, 'kph' => 0]);
 }
 
-$stmt->close();
 $conn->close();
 ?>

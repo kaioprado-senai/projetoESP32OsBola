@@ -1123,7 +1123,7 @@
     if (rem <= 0) triggerVictory();
   }, 250);
 
-  function updateGauges(kph) {
+  function updateGauges(kph, rpmReal = null) {
     const kp = kph / 340;
     $('kphval').textContent = kph;
     $('speedlabel').textContent = kph + ' km/h';
@@ -1133,7 +1133,13 @@
     const gear = kph === 0 ? 0 : kph < 80 ? 1 : kph < 140 ? 2 : kph < 190 ? 3 : kph < 240 ? 4 : kph < 290 ? 5 : kph < 320 ? 6 : 7;
     $('geartext').textContent = ['N', '1', '2', '3', '4', '5', '6', '7'][gear];
 
-    let rr = kph === 0 ? 0 : Math.min(1, (kp / (gear * 0.155)) * 0.92);
+    // Usa RPM real do sensor se disponível, senão simula pelo kph
+    let rr;
+    if (rpmReal !== null && rpmReal >= 0) {
+      rr = Math.min(1, rpmReal / 18000);
+    } else {
+      rr = kph === 0 ? 0 : Math.min(1, (kp / (gear * 0.155)) * 0.92);
+    }
     rr = Math.min(1, rr);
     const rpm = Math.round(rr * 18000);
     $('rpmval').textContent = (rpm / 1000).toFixed(1);
@@ -1157,6 +1163,7 @@
   const kphArc = $('kph-arc');
 
   let animKph = 0, targetKph = 0;
+  let lastRpm = null; // RPM real vindo do backend
   function lerp(a, b, t) { return a + (b - a) * t; }
 
   function mainLoop() {
@@ -1181,7 +1188,7 @@
     });
 
     checkOvertakes(smoothKph);
-    updateGauges(smoothKph);
+    updateGauges(smoothKph, lastRpm); // passa RPM real do sensor
     drawBg(smoothKph);
     drawRoad(smoothKph);
     if (confRunning) drawConfetti();
@@ -1196,6 +1203,7 @@
       if (!r.ok) throw new Error();
       const d = await r.json();
       if (d.kph !== undefined) slider.value = Math.min(340, Math.max(0, Math.round(d.kph)));
+      lastRpm = (d.rpm !== undefined) ? d.rpm : null; // armazena RPM real
     } catch (e) { }
   }
   setInterval(fetchData, 250);
